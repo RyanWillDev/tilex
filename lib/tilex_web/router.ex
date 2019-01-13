@@ -55,6 +55,9 @@ defmodule TilexWeb.Router do
     get("/profile/edit", DeveloperController, :edit)
     put("/profile/edit", DeveloperController, :update)
 
+    get("/channels/edit", ChannelController, :edit)
+    post("/channels/edit", ChannelController, :update)
+
     get("/", PostController, :index)
     resources("/posts", PostController, param: "titled_slug")
     post("/posts/:slug/like.json", PostController, :like)

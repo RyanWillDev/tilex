@@ -9,7 +9,7 @@
       <%= text_input f, :title, placeholder: "Enter title..." %>
     </dd>
   </dl>
-  <dl>
+  <dl style="margin-bottom: 32px">
     <dt>
       <%= label f, :body %>
       <%= error_tag f, :body %>
@@ -29,8 +29,19 @@
     <dd>
       <%= select f, :channel_id, @channels, prompt: "" %>
     </dd>
+
+    <dt>
+      <label for="new-channel-name">New Channel Name</label>
+      <input id="new-channel-name" type="text" />
+
+      <label for="new-channel-hashtag">New Channel Twitter Hashtag</label>
+      <input id="new-channel-hashtag" type="text" />
+
+      <button id="add-channel-button" type="button">Add Channel</button>
+    </dt>
+
   </dl>
-  <%= submit "Submit" %>
+  <%= submit "Submit Post" %>
   <%= link("cancel", to: "/") %>
 <% end %>
 

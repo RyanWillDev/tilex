@@ -58,12 +58,6 @@
     <header class="site_head">
       <div>
         <h1><a href="/">Today I Learned</a></h1>
-        <h2>
-          <a href="https://hashrocket.com" class="hr">A Hashrocket project</a>
-          <span>
-            <a href="https://twitter.com/<%= Application.get_env(:tilex, :default_twitter_handle)%>" class="twitter">Follow on Twitter</a>
-          </span>
-        </h2>
       </div>
     </header>
 
@@ -99,9 +93,7 @@
                 Hashrocket
               </a>
               that exists to catalogue the sharing & accumulation of knowledge
-              as it happens day-to-day. Posts have a 200-word limit, and
-              posting is open to any Rocketeer as well as selected friends of
-              Hashrocket. We hope you enjoy learning along with us.
+              as it happens day-to-day. We hope you enjoy learning along with us.
               <ul class="social">
                 <li>
                   <%= link("/#{Application.get_env(:tilex, :default_twitter_handle)}", to: "https://twitter.com/#{Application.get_env(:tilex, :default_twitter_handle)}", class: "social_twitter") %>

@@ -1,6 +1,7 @@
 import TextConversion from './text_conversion';
 import autosize from 'autosize';
 import CodeMirror from 'codemirror';
+import ChannelsList from './channelsList';
 import 'codemirror-mode-elixir';
 import 'codemirror/keymap/vim';
 import 'codemirror/mode/gfm/gfm';
@@ -22,10 +23,16 @@ export default class PostForm {
     this.$titleInput = properties.titleInput;
     this.$titleCharacterLimitContainer =
       properties.titleCharacterLimitContainer;
+    this.$addChannelButton = properties.addChannelButton;
+    this.$newChannelNameInput = properties.newChannelNameInput;
+    this.$newChannelHashtagInput = properties.newChannelHashTagInput;
+    this.$channelSelect = properties.channelSelect;
     this.titleCharacterLimit = properties.titleCharacterLimit;
     this.$previewTitleContainer = properties.previewTitleContainer;
     this.handlePostBodyPreview = this.handlePostBodyPreview.bind(this);
+    this.handleAddChannel = this.handleAddChannel.bind(this);
     this.textConversion = this.textConversion();
+    this.channelsList = this.channelsList();
   }
 
   init() {
@@ -34,6 +41,8 @@ export default class PostForm {
     }
 
     this.textConversion.init();
+    this.channelsList.init();
+
     this.setInitialPreview();
     this.observePostBodyInputChange();
     this.observeTitleInputChange();
@@ -47,7 +56,7 @@ export default class PostForm {
         mode: 'gfm',
         insertSoftTab: true,
         smartIndent: false,
-        lineWrapping: true,
+        lineWrapping: true
       };
 
       const options =
@@ -64,6 +73,8 @@ export default class PostForm {
         that.$postBodyInput.val(value).trigger('change');
       });
     }
+
+    this.$addChannelButton.on('click', this.handleAddChannel);
   }
 
   setInitialPreview() {
@@ -116,6 +127,28 @@ export default class PostForm {
     Prism.highlightAll(this.$postBodyPreview.html(html));
   }
 
+  handleAddChannel() {
+    if (!this.$newChannelNameInput.val() || !this.$newChannelHashtagInput.val())
+      return;
+
+    this.channelsList.addChannel({
+      name: this.$newChannelNameInput.val(),
+      twitter_hashtag: this.$newChannelHashtagInput.val()
+    });
+  }
+
+  handleChannelListUpdate(channels) {
+    if (!channels.length) return;
+
+    var html = channels.map(function(channel) {
+      return $('<option>')
+        .val(channel.id)
+        .text(channel.name);
+    });
+
+    this.$channelSelect.html(html);
+  }
+
   observePostBodyInputChange() {
     this.$postBodyInput.on('keyup', e => {
       this.updateWordCount();
@@ -139,7 +172,13 @@ export default class PostForm {
 
   textConversion() {
     return new TextConversion({
-      convertedTextCallback: this.handlePostBodyPreview,
+      convertedTextCallback: this.handlePostBodyPreview
+    });
+  }
+
+  channelsList() {
+    return new ChannelsList({
+      channelsListChangeCallback: this.handleChannelListUpdate.bind(this)
     });
   }
 }

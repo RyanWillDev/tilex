@@ -4,6 +4,7 @@ defmodule TilexWeb.UserSocket do
   ## Channels
   channel("post:search", Tilex.PostChannel)
   channel("text_converter", Tilex.TextConverterChannel)
+  channel("channels_list", Tilex.ChannelsListChannel)
 
   ## Transports
   transport(:websocket, Phoenix.Transports.WebSocket)

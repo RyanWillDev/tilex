@@ -1,7 +1,7 @@
 defmodule TilexWeb.ChannelController do
   use TilexWeb, :controller
 
-  alias Tilex.Posts
+  alias Tilex.{Channels, Posts}
 
   def show(conn, %{"name" => channel_name} = params) do
     page =
@@ -19,5 +19,10 @@ defmodule TilexWeb.ChannelController do
       channel: channel,
       page: page
     )
+  end
+
+  def edit(conn, _params) do
+    channels = Channels.all()
+    render(conn, "edit.html", channels: channels)
   end
 end

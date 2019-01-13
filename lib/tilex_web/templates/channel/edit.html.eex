@@ -1,0 +1,11 @@
+<main>
+  <section>
+    <h1>Hola</h1>
+
+    <ul>
+      <%= for channel <- @channels do %>
+        <li><%= channel.name %></li>
+      <% end %>
+    </ul>
+  </section>
+</main>

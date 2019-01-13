@@ -22,7 +22,7 @@ config :tilex, Tilex.Repo,
 
 config :tilex, :organization_name, "Hashrocket"
 config :tilex, :canonical_domain, "https://til.hashrocket.com"
-config :tilex, :default_twitter_handle, "hashrocket"
+config :tilex, :default_twitter_handle, System.get_env("DEFAULT_TWITTER_HANDLE")
 config :tilex, :hosted_domain, "hashrocket.com"
 config :tilex, :auth_controller, Test.AuthController
 config :tilex, :slack_notifier, Test.Notifications.Notifiers.Slack
