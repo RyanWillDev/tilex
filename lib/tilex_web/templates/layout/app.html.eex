@@ -88,12 +88,13 @@
           <%= link("?", to: "#", class: "site_nav__link") %>
           <div class="site_nav__toggle">
             <div class="copy">
-              Today I Learned is an open-source project by
+              This project was forked from the
+              Today I Learned open-source project created by
               <a href="https://hashrocket.com">
-                Hashrocket
+                Hashrocket.
               </a>
-              that exists to catalogue the sharing & accumulation of knowledge
-              as it happens day-to-day. We hope you enjoy learning along with us.
+              It exists to catalogue the sharing & accumulation of knowledge
+              as it happens day-to-day. I hope you enjoy learning along with me.
               <ul class="social">
                 <li>
                   <%= link("/#{Application.get_env(:tilex, :default_twitter_handle)}", to: "https://twitter.com/#{Application.get_env(:tilex, :default_twitter_handle)}", class: "social_twitter") %>

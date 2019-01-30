@@ -4,8 +4,8 @@ html
 body
   -webkit-text-size-adjust: none
   -webkit-font-smoothing: antialiased
-  background: $light
-  color: $dark
+  background: $dark
+  color: $light
   font-family: $primary-typeface
   font-size: 1.6em
 
@@ -24,7 +24,7 @@ header.site_head
     display: block
     font-family: $secondary-typeface
     text-transform: uppercase
-    color: $navy
+    color: $blue
     letter-spacing: .1em
     font-weight: 900
     font-size: 7vw
@@ -55,9 +55,10 @@ header.site_head
         margin: 0 0 0 1rem
   +mobile
     z-index: 100
-    background: #fff
-    text-align: right
+    text-align: center
     +box_outline
+    background-color: $dark
+    border-color: $dark
     padding-right: 1rem
     padding-bottom: 0
     h2
