@@ -33,3 +33,5 @@ erl_crash.dump
 /priv/static/js/app.js
 /priv/static/js/app.js.map
 .elixir_ls/
+**/.DS_Store
+.DS_Store

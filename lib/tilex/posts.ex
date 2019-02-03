@@ -11,6 +11,8 @@ defmodule Tilex.Posts do
   end
 
   def by_channel(channel_name, page) do
+    require IEx
+    IEx.pry
     channel = Repo.get_by!(Channel, name: channel_name)
 
     query =
