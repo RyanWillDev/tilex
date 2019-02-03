@@ -80,7 +80,7 @@ config :appsignal, :config, active: true
 config :tilex, :page_size, 50
 config :tilex, :request_tracking, "${REQUEST_TRACKING}"
 
-config :extwitter, :oauth
+config :extwitter, :oauth,
   consumer_key: "${twitter_consumer_key}",
   consumer_secret: "${twitter_consumer_secret}",
   access_token: "${twitter_access_token}",
