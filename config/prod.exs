@@ -65,17 +65,34 @@ config :tilex, TilexWeb.Endpoint, force_ssl: [rewrite_on: [:x_forwarded_proto]]
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
 
-if System.get_env("ENABLE_BASIC_AUTH") do
-  config :tilex, :basic_auth,
-    realm: "tilex",
-    username: System.get_env("BASIC_AUTH_USERNAME"),
-    password: System.get_env("BASIC_AUTH_PASSWORD")
-end
+# if System.get_env("ENABLE_BASIC_AUTH") do
+#   config :tilex, :basic_auth,
+#     realm: "tilex",
+#     username: System.get_env("BASIC_AUTH_USERNAME"),
+#     password: System.get_env("BASIC_AUTH_PASSWORD")
+# end
 
 config :tilex, :page_size, 50
-config :tilex, :ga_identifier, System.get_env("GA_IDENTIFIER")
+config :tilex, :ga_identifier, "${GA_IDENTIFIER}"
 
 config :appsignal, :config, active: true
 
 config :tilex, :page_size, 50
-config :tilex, :request_tracking, System.get_env("REQUEST_TRACKING")
+config :tilex, :request_tracking, "${REQUEST_TRACKING}"
+
+config :extwitter, :oauth
+  consumer_key: "${twitter_consumer_key}",
+  consumer_secret: "${twitter_consumer_secret}",
+  access_token: "${twitter_access_token}",
+  access_token_secret: "${twitter_access_token_secret}"
+
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: "${GOOGLE_CLIENT_ID}",
+  client_secret: "${GOOGLE_CLIENT_SECRET}"
+
+config :tilex, :organization_name, "${ORGANIZATION_NAME}"
+config :tilex, :canonical_domain, "${CANONICAL_DOMAIN}"
+config :tilex, :default_twitter_handle, "${DEFAULT_TWITTER_HANDLE}"
+config :tilex, :cors_origin, "${CORS_ORIGIN}"
+config :tilex, :hosted_domain, "${HOSTED_DOMAIN}"
+config :tilex, :guest_author_whitelist, "${GUEST_AUTHOR_WHITELIST}"

@@ -21,12 +21,7 @@ config :tilex, :page_size, 5
 config :tilex, :auth_controller, AuthController
 config :tilex, :slack_notifier, Tilex.Notifications.Notifiers.Slack
 config :tilex, :twitter_notifier, Tilex.Notifications.Notifiers.Twitter
-config :tilex, :organization_name, System.get_env("ORGANIZATION_NAME")
-config :tilex, :canonical_domain, System.get_env("CANONICAL_DOMAIN")
-config :tilex, :default_twitter_handle, System.get_env("DEFAULT_TWITTER_HANDLE")
-config :tilex, :cors_origin, System.get_env("CORS_ORIGIN")
-config :tilex, :hosted_domain, System.get_env("HOSTED_DOMAIN")
-config :tilex, :guest_author_whitelist, System.get_env("GUEST_AUTHOR_WHITELIST")
+
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -44,9 +39,7 @@ config :ueberauth, Ueberauth,
        ]}
   ]
 
-config :ueberauth, Ueberauth.Strategy.Google.OAuth,
-  client_id: System.get_env("GOOGLE_CLIENT_ID"),
-  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
 
 config :guardian, Guardian,
   # optional
@@ -64,11 +57,7 @@ config :guardian, Guardian,
   },
   serializer: Tilex.GuardianSerializer
 
-config :extwitter, :oauth,
-  consumer_key: System.get_env("twitter_consumer_key"),
-  consumer_secret: System.get_env("twitter_consumer_secret"),
-  access_token: System.get_env("twitter_access_token"),
-  access_token_secret: System.get_env("twitter_access_token_secret")
+
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

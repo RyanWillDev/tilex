@@ -51,3 +51,20 @@ config :tilex, :cors_origin, "http://localhost:3000"
 config :tilex, :default_twitter_handle, System.get_env("DEFAULT_TWITTER_HANDLE")
 
 config :tilex, :request_tracking, true
+
+config :extwitter, :oauth,
+  consumer_key: System.get_env("twitter_consumer_key"),
+  consumer_secret: System.get_env("twitter_consumer_secret"),
+  access_token: System.get_env("twitter_access_token"),
+  access_token_secret: System.get_env("twitter_access_token_secret")
+
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
+config :tilex, :organization_name, System.get_env("ORGANIZATION_NAME")
+config :tilex, :canonical_domain, System.get_env("CANONICAL_DOMAIN")
+config :tilex, :default_twitter_handle, System.get_env("DEFAULT_TWITTER_HANDLE")
+config :tilex, :cors_origin, System.get_env("CORS_ORIGIN")
+config :tilex, :hosted_domain, System.get_env("HOSTED_DOMAIN")
+config :tilex, :guest_author_whitelist, System.get_env("GUEST_AUTHOR_WHITELIST")
