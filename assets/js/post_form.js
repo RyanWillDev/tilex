@@ -182,13 +182,6 @@ export default class PostForm {
     this.$channelSelect.html(html);
   }
 
-  observePostBodyInputChange() {
-    this.$postBodyInput.on('keyup', e => {
-      this.updateWordCount();
-      this.updateWordLimit();
-      this.textConversion.convert(e.target.value, 'markdown');
-    });
-
   hideLoadingIndicator() {
     this.loadingIndicator.style.display = 'none';
   }
