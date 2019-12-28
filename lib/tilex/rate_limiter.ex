@@ -2,12 +2,17 @@ defmodule Tilex.RateLimiter do
   use GenServer
 
   @name __MODULE__
-  @date_time_module Application.get_env(:tilex, :date_time_module)
-  @limit Application.get_env(:tilex, :rate_limiter_requests_per_time_period)
-  @time_period_minutes Application.get_env(:tilex, :rate_limiter_time_period_minutes)
-                       |> Timex.Duration.from_minutes()
+  # @date_time_module Application.get_env(:tilex, :date_time_module)
+  @date_time_module DateTime
+  #@limit Application.get_env(:tilex, :rate_limiter_requests_per_time_period)
+  @limit 50
+  #@time_period_minutes Application.get_env(:tilex, :rate_limiter_time_period_minutes)
+  #                     |> Timex.Duration.from_minutes()
+  @time_period_minutes 1 |> Timex.Duration.from_minutes()
   @table_name :rate_limiter_lookup
-  @cleanup_interval Application.get_env(:tilex, :rate_limiter_cleanup_interval)
+  #@cleanup_interval Application.get_env(:tilex, :rate_limiter_cleanup_interval)
+  # Ten hours
+  @cleanup_interval 10 * 60 * 60_000 
 
   def start_link do
     GenServer.start_link(__MODULE__, [], name: @name)
