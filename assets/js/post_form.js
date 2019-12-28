@@ -17,7 +17,6 @@ import 'codemirror/theme/dracula.css';
 import { uploadImage } from './image_uploader.js';
 
 export default class PostForm {
-<<<<<<< HEAD
   constructor(properties) {
     this.$postBodyInput = properties.postBodyInput;
     this.$postBodyPreview = properties.postBodyPreview;
