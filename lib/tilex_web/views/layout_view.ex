@@ -3,6 +3,23 @@ defmodule TilexWeb.LayoutView do
 
   @request_tracking Application.get_env(:tilex, :request_tracking)
 
+  def current_user(conn) do
+    Guardian.Plug.current_resource(conn)
+  end
+
+  def ga_identifier do
+    Application.get_env(:tilex, :ga_identifier)
+  end
+
+  def imgur_api_key(conn) do
+    current_user(conn) && Application.get_env(:tilex, :imgur_client_id)
+  end
+
+  def editor_preference(conn) do
+    user = current_user(conn)
+    user && user.editor
+  end
+
   def page_title(%{post: post}), do: post.title
   def page_title(%{channel: channel}), do: String.capitalize(channel.name)
   def page_title(%{developer: developer}), do: developer.username
@@ -44,7 +61,9 @@ defmodule TilexWeb.LayoutView do
   def twitter_description(%Tilex.Post{} = post) do
     markdown = Tilex.Post.twitter_description(post)
 
-    with {:ok, html, _} <- Earmark.as_html(markdown),
+    earmark_options = %Earmark.Options{pure_links: false}
+
+    with {:ok, html, _} <- Earmark.as_html(markdown, earmark_options),
          text <- Floki.text(html) do
       text
     else

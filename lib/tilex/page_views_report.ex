@@ -16,36 +16,36 @@ defmodule Tilex.PageViewsReport do
   defp create_report(rows) do
     last_week_row =
       rows
-      |> Enum.find(fn [_, _, period] -> period == "week" end)
+      |> Enum.find(&match?([_, _, "week"], &1))
 
     best_day_last_week =
       rows
-      |> Enum.filter(fn [_, _, p] -> p == "day" end)
-      |> Enum.filter(fn [_, d, _] ->
+      |> Stream.filter(&match?([_, _, "day"], &1))
+      |> Stream.filter(fn [_, d, _] ->
         Timex.compare(d, Enum.at(last_week_row, 1)) == 1 or
           Timex.compare(d, Enum.at(last_week_row, 1)) == 0
       end)
       |> Enum.sort_by(fn [c | _] -> c end)
       |> Enum.reverse()
-      |> hd
+      |> List.first()
 
     previous_week_row =
       rows
-      |> Enum.filter(fn [_, _, period] -> period == "week" end)
+      |> Stream.filter(&match?([_, _, "week"], &1))
       |> Enum.reverse()
-      |> hd
+      |> List.first()
 
     best_day_previous_week =
       rows
-      |> Enum.filter(fn [_, _, p] -> p == "day" end)
-      |> Enum.filter(fn [_, d, _] ->
+      |> Stream.filter(&match?([_, _, "day"], &1))
+      |> Stream.filter(fn [_, d, _] ->
         (Timex.compare(d, Enum.at(previous_week_row, 1)) == 1 or
            Timex.compare(d, Enum.at(previous_week_row, 1)) == 0) and
           Timex.compare(d, Enum.at(last_week_row, 1)) == -1
       end)
       |> Enum.sort_by(fn [c | _] -> c end)
       |> Enum.reverse()
-      |> hd
+      |> List.first()
 
     report = """
     Best Day Last Week:   #{day_output(best_day_last_week)}
@@ -58,7 +58,11 @@ defmodule Tilex.PageViewsReport do
   end
 
   defp day_output([count, date, _period]) do
-    "#{String.pad_leading(to_string(count), 10, " ")} #{format(date)}"
+    "#{count |> to_string |> String.pad_leading(10, " ")} #{format(date)}"
+  end
+
+  defp day_output(nil) do
+    String.pad_leading("No data available", 10)
   end
 
   defp format(date) do

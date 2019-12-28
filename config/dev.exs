@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -13,9 +13,10 @@ config :tilex, TilexWeb.Endpoint,
   check_origin: false,
   watchers: [
     node: [
-      "node_modules/brunch/bin/brunch",
-      "watch",
-      "--stdin",
+      "node_modules/webpack/bin/webpack.js",
+      "--mode",
+      "development",
+      "--watch-stdin",
       cd: Path.expand("../assets", __DIR__)
     ]
   ]
@@ -26,8 +27,8 @@ config :tilex, TilexWeb.Endpoint,
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
-      ~r{lib/tilex/web/views/.*(ex)$},
-      ~r{lib/tilex/web/templates/.*(eex)$}
+      ~r{lib/tilex_web/views/.*(ex)$},
+      ~r{lib/tilex_web/templates/.*(eex)$}
     ]
   ]
 

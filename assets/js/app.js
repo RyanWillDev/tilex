@@ -19,9 +19,10 @@ import 'jquery.cookie';
 //
 // Local files can be imported directly using relative
 // paths "./socket" or full ones "web/static/js/socket".
+import css from '../css/app.scss';
 
 // import socket from "./socket"
 import tilex from './tilex';
 import like from './like';
 import twitter from './twitter_button';
-import prism from './prism';
+import prism from '../vendor/js/prism';

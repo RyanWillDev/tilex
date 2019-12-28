@@ -8,6 +8,8 @@ defmodule VisitorViewsPostTest do
   }
 
   test "the page shows a post", %{session: session} do
+    Application.put_env(:tilex, :date_display_tz, "")
+
     developer = Factory.insert!(:developer)
     channel = Factory.insert!(:channel, name: "command-line")
 
@@ -16,6 +18,7 @@ defmodule VisitorViewsPostTest do
         :post,
         title: "A special post",
         body: "This is how to be super awesome!",
+        inserted_at: Timex.to_datetime({2018, 2, 2}),
         developer: developer,
         channel: channel
       )
@@ -29,15 +32,41 @@ defmodule VisitorViewsPostTest do
       likes_count: 1
     })
 
+    assert post_date(session) == "February 2, 2018"
+
     assert page_title(session) == "A special post - Today I Learned"
 
-    assert %{rows: [[path | _]]} =
-             Ecto.Adapters.SQL.query!(
-               Repo,
-               "select page, request_time from requests"
-             )
+    last_request_query =
+      from(r in "requests",
+        select: %{page: r.page},
+        order_by: [desc: r.request_time],
+        limit: 1
+      )
 
-    assert Regex.match?(~r"#{post.slug}", path)
+    assert %{page: path} = Repo.one(last_request_query)
+
+    assert path =~ post.slug
+  end
+
+  test "the page shows a post with the correct timezone if given", %{session: session} do
+    Application.put_env(:tilex, :date_display_tz, "America/Chicago")
+
+    developer = Factory.insert!(:developer)
+    channel = Factory.insert!(:channel, name: "command-line")
+
+    post =
+      Factory.insert!(
+        :post,
+        title: "A special post",
+        body: "This is how to be super awesome!",
+        inserted_at: Timex.to_datetime({2018, 2, 2}),
+        developer: developer,
+        channel: channel
+      )
+
+    session |> PostShowPage.navigate(post)
+
+    assert post_date(session) == "February 1, 2018"
   end
 
   test "and sees marketing copy, if it exists", %{session: session} do
@@ -129,6 +158,7 @@ defmodule VisitorViewsPostTest do
   end
 
   test "and clicks 'like' for that post", %{session: session} do
+    Tilex.DateTimeMock.start_link([])
     developer = Factory.insert!(:developer)
     post = Factory.insert!(:post, title: "A special post", developer: developer, likes: 1)
 
@@ -206,5 +236,11 @@ defmodule VisitorViewsPostTest do
     })
 
     assert page_title(session) == "#{post.title} - Today I Learned"
+  end
+
+  defp post_date(session) do
+    session
+    |> find(Query.css("footer .post__permalink"))
+    |> Element.text()
   end
 end

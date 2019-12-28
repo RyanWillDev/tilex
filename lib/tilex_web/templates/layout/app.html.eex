@@ -8,11 +8,11 @@
     <meta name="csrf" content="<%= Plug.CSRFProtection.get_csrf_token() %>">
 
     <meta name="format-detection" content="telephone=no">
-    <meta name="description" content="TIL is an open-source project by Hashrocket that exists to catalogue the sharing & accumulation of knowledge as it happens day-to-day.">
+    <meta name="description" content="TIL is an open-source project originally created by Hashrocket that exists to catalogue the sharing & accumulation of knowledge as it happens day-to-day.">
 
     <meta itemprop="name" content="Today I Learned">
     <meta itemprop="brand" content="Today I Learned">
-    <meta itemprop="description" content="TIL is an open-source project by Hashrocket that exists to catalogue the sharing & accumulation of knowledge as it happens day-to-day.">
+    <meta itemprop="description" content="TIL is an open-source project originally created by Hashrocket that exists to catalogue the sharing & accumulation of knowledge as it happens day-to-day.">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -23,28 +23,28 @@
     <meta name="twitter:description" content="<%= twitter_description(assigns[:post]) %>">
     <meta name="twitter:image" content=<%= twitter_image_url(assigns[:post]) %>>
 
-    <link href='//fonts.googleapis.com/css?family=Raleway:700,900' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Lora:400,700italic,700,400italic' rel='stylesheet' type='text/css'>
-    <link rel="alternate feed" type="application/rss+xml" title="Today I Learned" href="/rss">
+    <link href='//fonts.googleapis.com/css?family=Raleway:700,900&display=swap' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700italic,700,400italic&display=swap' rel='stylesheet' type='text/css'>
+    <link rel="alternate feed" type="application/rss+xml" title="Today I Learned" href="<%= feed_path(@conn, :index) %>">
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css">
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+    <link rel="stylesheet" href="<%= static_url(@conn, "/css/app.css") %>">
     <%= if assigns[:canonical_url] do %>
       <link rel="canonical" href="<%= @canonical_url %>">
     <% end %>
     <link rel="manifest" href="<%= web_manifest_path(@conn, :index) %>">
 
     <%= if request_tracking() do %>
-      <script async src="/pixel"></script>
+      <script async src="<%= pixel_path(@conn, :index) %>"></script>
     <% end %>
   </head>
 
   <body>
-    <%= if developer = Guardian.Plug.current_resource(@conn) do %>
+    <%= if developer = current_user(@conn) do %>
       <nav class="admin_panel">
         <ul>
           <li> <%= link(developer.username, to: developer_path(@conn, :show, developer)) %> </li>
@@ -55,9 +55,22 @@
       </nav>
     <% end %>
 
-    <header class="site_head">
+    <header class="site_head <%= if System.get_env("BANNER"), do: "has-banner" %>">
+      <%= if (System.get_env("BANNER")) do %>
+        <div class="banner">
+          <div class="message">
+            Hashrocket is hosting a <strong>Ruby</strong>, <strong>Rails</strong>, and <strong>React</strong> conference. Buy your tickets for <a href="https://www.ancientcityruby.com/">ACR</a> today!
+          </div>
+        </div>
+      <% end %>
       <div>
-        <h1><a href="/">Today I Learned</a></h1>
+
+        <h1><%= link("Today I Learned", to: post_path(@conn, :index)) %></h1>
+        <h2>
+          <span>
+            <a href="https://twitter.com/<%= Application.get_env(:tilex, :default_twitter_handle)%>" class="twitter">Follow on Twitter</a>
+          </span>
+        </h2>
       </div>
     </header>
 
@@ -79,13 +92,13 @@
           <%= link("search", to: "#", class: "site_nav__link") %>
           <div class="site_nav__toggle">
             <%= form_tag post_path(@conn, :index), method: :get do %>
-              <input type="search" name="q" id="q">
+              <input type="search" name="q" id="q" aria-label="Search">
               <%= submit "Search" %>
             <% end %>
           </div>
         </li>
         <li class="site_nav__about">
-          <%= link("?", to: "#", class: "site_nav__link") %>
+          <%= link("?", to: "#", class: "site_nav__link", aria_label: "About TIL") %>
           <div class="site_nav__toggle">
             <div class="copy">
               This project was forked from the
@@ -107,19 +120,32 @@
           </div>
         </li>
         <li class="site_nav__statistics">
-          <%= link("Statistics", to: "/statistics", class: "site_nav__link") %>
+          <%= if current_user(@conn) do %>
+            <%= link("Statistics", to: stats_path(@conn, :developer), class: "site_nav__link") %>
+          <% else %>
+            <%= link("Statistics", to: stats_path(@conn, :index), class: "site_nav__link") %>
+          <% end %>
         </li>
         <li class="site_nav__twitter">
             <%= link("Twitter", to: "https://twitter.com/#{Application.get_env(:tilex, :default_twitter_handle)}", class: "site_nav__link") %>
         </li>
         <li class="site_nav__surprise_me">
-            <%= link("Surprise Me", to: "/random", class: "site_nav__link", rel: "nofollow") %>
+            <%= link("Surprise Me", to: post_path(@conn, :random), class: "site_nav__link", rel: "nofollow") %>
         </li>
       </ul>
     </nav>
-    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
 
-    <%= if Application.get_env(:tilex, :ga_identifier) do %>
+    <script type="text/javascript">
+      window.Tilex = window.Tilex || {};
+      window.Tilex.clientConfig = {
+        editor: '<%= editor_preference(@conn) %>',
+        imgurApiKey: '<%= imgur_api_key(@conn) %>',
+      };
+    </script>
+
+    <script src="<%= static_url(@conn, "/js/app.js") %>"></script>
+
+    <%= if ga_identifier() do %>
       <script type="text/javascript">
         (function(i, s, o, g, r, a, m) {
           i['GoogleAnalyticsObject'] = r;
@@ -140,7 +166,7 @@
           'ga'
         );
 
-        ga('create', '<%= Application.get_env(:tilex, :ga_identifier) %>', 'auto');
+        ga('create', '<%= ga_identifier() %>', 'auto');
         ga('send', 'pageview');
       </script>
     <% end %>

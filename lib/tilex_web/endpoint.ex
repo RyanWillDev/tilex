@@ -1,17 +1,34 @@
 defmodule TilexWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :tilex
+  use Appsignal.Phoenix
+
+  @cors_origin Application.get_env(:tilex, :cors_origin)
 
   if Application.get_env(:tilex, :sql_sandbox) do
     plug(Phoenix.Ecto.SQL.Sandbox)
   end
 
-  socket("/socket", TilexWeb.UserSocket)
+  socket("/socket", TilexWeb.UserSocket, websocket: true)
+
+  if @cors_origin do
+    origin =
+      @cors_origin
+      |> String.split([",", " "], trim: true)
+
+    plug(CORSPlug, origin: origin)
+  end
 
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
-  plug(Plug.Static, at: "/", from: :tilex, gzip: true, only: ~w(assets
+  plug(Plug.Static,
+    at: "/",
+    from: :tilex,
+    gzip: true,
+    headers: [{"access-control-allow-origin", "*"}],
+    only: ~w(
+      assets
       apple-touch-icon-120x120.png
       apple-touch-icon.png
       apple-touch-icon-precomposed.png
@@ -22,7 +39,8 @@ defmodule TilexWeb.Endpoint do
       images
       js
       robots.txt
-    ))
+    )
+  )
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -39,7 +57,7 @@ defmodule TilexWeb.Endpoint do
     Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: Jason
   )
 
   plug(Plug.MethodOverride)

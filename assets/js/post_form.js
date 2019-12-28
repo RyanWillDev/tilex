@@ -12,8 +12,12 @@ import 'codemirror/mode/elm/elm';
 import 'codemirror/mode/erlang/erlang';
 import 'codemirror/mode/css/css';
 import 'codemirror/mode/sass/sass';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/dracula.css';
+import { uploadImage } from './image_uploader.js';
 
 export default class PostForm {
+<<<<<<< HEAD
   constructor(properties) {
     this.$postBodyInput = properties.postBodyInput;
     this.$postBodyPreview = properties.postBodyPreview;
@@ -29,6 +33,7 @@ export default class PostForm {
     this.$channelSelect = properties.channelSelect;
     this.titleCharacterLimit = properties.titleCharacterLimit;
     this.$previewTitleContainer = properties.previewTitleContainer;
+    this.loadingIndicator = props.loadingIndicator;
     this.handlePostBodyPreview = this.handlePostBodyPreview.bind(this);
     this.handleAddChannel = this.handleAddChannel.bind(this);
     this.textConversion = this.textConversion();
@@ -36,19 +41,21 @@ export default class PostForm {
   }
 
   init() {
-    if (!this.$postBodyInput.length) {
-      return;
-    }
+    if (!this.$postBodyInput.length) return;
 
+    const { editor } = window.Tilex.clientConfig;
     this.textConversion.init();
     this.channelsList.init();
 
     this.setInitialPreview();
     this.observePostBodyInputChange();
     this.observeTitleInputChange();
+    this.observeImagePaste();
     autosize(this.$postBodyInput);
 
-    if (/Code Editor|Vim/.test(TIL.editor)) {
+    const useCodeMirror = /Code Editor|Vim/.test(editor);
+
+    if (useCodeMirror) {
       const defaultOptions = {
         lineNumbers: true,
         theme: 'dracula',
@@ -60,17 +67,30 @@ export default class PostForm {
       };
 
       const options =
-        TIL.editor === 'Vim'
-          ? Object.assign({}, defaultOptions, { keyMap: 'vim' })
+        editor === 'Vim'
+          ? { ...defaultOptions, keyMap: 'vim' }
           : defaultOptions;
 
       const textarea = this.$postBodyInput.get(0);
-      const editor = CodeMirror.fromTextArea(textarea, options);
+      const codeMirror = CodeMirror.fromTextArea(textarea, options);
 
-      const that = this;
-      editor.on('changes', instance => {
+      // const that = this;
+      codeMirror.on('changes', instance => {
         const value = instance.getValue();
-        that.$postBodyInput.val(value).trigger('change');
+        this.$postBodyInput.val(value).trigger('change');
+      });
+
+      codeMirror.on('paste', (instance, ev) => {
+        const handleImageUploadSuccess = url => {
+          instance.replaceSelection(this.urlToMarkdownImage(url));
+          this.hideLoadingIndicator();
+        };
+
+        this.handleEditorPaste(
+          ev,
+          handleImageUploadSuccess,
+          this.handleImageUploadError
+        );
       });
     }
 
@@ -113,7 +133,7 @@ export default class PostForm {
   }
 
   updatePreviewTitle() {
-    this.$previewTitleContainer.html(this.$titleInput.val());
+    this.$previewTitleContainer.text(this.$titleInput.val());
   }
 
   renderCountMessage($el, amount, noun) {
@@ -123,8 +143,22 @@ export default class PostForm {
       .text(amount + ' ' + noun + plural + ' available');
   }
 
-  handlePostBodyPreview(html) {
-    Prism.highlightAll(this.$postBodyPreview.html(html));
+  handleEditorPaste = (ev, onSuccess, onError) => {
+    const clipboard = ev.clipboardData
+      ? ev.clipboardData
+      : ev.originalEvent.clipboardData;
+    const files = clipboard.files;
+    const file = files.length > 0 ? files[0] : null;
+    const isImage = file && !!file.type.match('image');
+
+    if (isImage) {
+      this.showLoadingIndicator();
+      uploadImage(file, onSuccess, onError);
+    }
+  };
+
+  showLoadingIndicator() {
+    this.loadingIndicator.style.display = 'flex';
   }
 
   handleAddChannel() {
@@ -156,11 +190,44 @@ export default class PostForm {
       this.textConversion.convert(e.target.value, 'markdown');
     });
 
-    this.$postBodyInput.on('change', e => {
-      this.updateWordCount();
-      this.updateWordLimit();
-      this.textConversion.convert(e.target.value, 'markdown');
+  hideLoadingIndicator() {
+    this.loadingIndicator.style.display = 'none';
+  }
+
+  handleImageUploadError = ({ showAlert = true }) => {
+    if (showAlert) alert(`Failed to upload image to Imgur`);
+    this.hideLoadingIndicator();
+  };
+
+  handlePostBodyPreview = html => {
+    Prism.highlightAll(this.$postBodyPreview.html(html));
+  };
+
+  handlePostBodyChanged = ({ target: { value } }) => {
+    this.updateWordCount();
+    this.updateWordLimit();
+    this.textConversion.convert(value, 'markdown');
+  };
+
+  observeImagePaste() {
+    this.$postBodyInput.on('paste', ev => {
+      const handleImageUploadSuccess = url => {
+        this.hideLoadingIndicator();
+        this.replaceSelection(ev.target, this.urlToMarkdownImage(url));
+        this.handlePostBodyChanged(ev);
+      };
+
+      this.handleEditorPaste(
+        ev,
+        handleImageUploadSuccess,
+        this.handleImageUploadError
+      );
     });
+  }
+
+  observePostBodyInputChange() {
+    this.$postBodyInput.on('keyup', this.handlePostBodyChanged);
+    this.$postBodyInput.on('change', this.handlePostBodyChanged);
   }
 
   observeTitleInputChange() {
@@ -168,6 +235,23 @@ export default class PostForm {
       this.updateTitleLimit();
       this.updatePreviewTitle();
     });
+  }
+
+  urlToMarkdownImage(url) {
+    return `![image](${url})`;
+  }
+
+  replaceSelection(field, myValue) {
+    if (field.selectionStart || field.selectionStart == '0') {
+      var startPos = field.selectionStart;
+      var endPos = field.selectionEnd;
+      field.value =
+        field.value.substring(0, startPos) +
+        myValue +
+        field.value.substring(endPos, field.value.length);
+    } else {
+      field.value += myValue;
+    }
   }
 
   textConversion() {

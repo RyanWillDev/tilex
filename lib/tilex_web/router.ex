@@ -2,7 +2,6 @@ defmodule TilexWeb.Router do
   use TilexWeb, :router
 
   @auth_controller Application.get_env(:tilex, :auth_controller)
-  @cors_origin Application.get_env(:tilex, :cors_origin)
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -15,16 +14,21 @@ defmodule TilexWeb.Router do
   end
 
   pipeline :browser_auth do
+    plug(Guardian.Plug.Pipeline,
+      module: Tilex.Auth.Guardian,
+      error_handler: Tilex.Auth.ErrorHandler
+    )
+
     plug(Guardian.Plug.VerifySession)
-    plug(Guardian.Plug.LoadResource)
+    plug(Guardian.Plug.LoadResource, allow_blank: true)
   end
 
   pipeline :api do
-    if @cors_origin do
-      plug(CORSPlug, origin: @cors_origin)
-    end
-
     plug(:accepts, ["json"])
+  end
+
+  pipeline :rate_limit do
+    plug(Tilex.Plug.RateLimiter)
   end
 
   scope "/api", TilexWeb do
@@ -37,6 +41,13 @@ defmodule TilexWeb.Router do
   get("/pixel", TilexWeb.PixelController, :index)
 
   scope "/", TilexWeb do
+    pipe_through([:browser, :rate_limit])
+
+    post("/posts/:slug/like.json", PostController, :like)
+    post("/posts/:slug/unlike.json", PostController, :unlike)
+  end
+
+  scope "/", TilexWeb do
     pipe_through([:browser, :browser_auth])
 
     get("/admin", @auth_controller, :index)
@@ -46,11 +57,11 @@ defmodule TilexWeb.Router do
     post("/auth/:provider/callback", AuthController, :callback)
 
     get("/statistics", StatsController, :index)
+    get("/developer/statistics", StatsController, :developer)
 
     get("/sitemap.xml", SitemapController, :index)
     get("/manifest.json", WebManifestController, :index)
     get("/random", PostController, :random)
-    get("/:name", ChannelController, :show)
     get("/authors/:name", DeveloperController, :show)
     get("/profile/edit", DeveloperController, :edit)
     put("/profile/edit", DeveloperController, :update)
@@ -60,7 +71,7 @@ defmodule TilexWeb.Router do
 
     get("/", PostController, :index)
     resources("/posts", PostController, param: "titled_slug")
-    post("/posts/:slug/like.json", PostController, :like)
-    post("/posts/:slug/unlike.json", PostController, :unlike)
+    # catch-any route should be last
+    get("/:name", ChannelController, :show)
   end
 end

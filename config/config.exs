@@ -1,12 +1,15 @@
 # This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
+# and its dependencies with the aid of the Config module.
 #
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
-use Mix.Config
+import Config
 
 # General application configuration
 config :tilex, ecto_repos: [Tilex.Repo]
+
+# Use Jason for JSON parsing in Phoenix
+config :phoenix, :json_library, Jason
 
 # Configures the endpoint
 config :tilex, TilexWeb.Endpoint,
@@ -21,7 +24,6 @@ config :tilex, :page_size, 5
 config :tilex, :auth_controller, AuthController
 config :tilex, :slack_notifier, Tilex.Notifications.Notifiers.Slack
 config :tilex, :twitter_notifier, Tilex.Notifications.Notifiers.Twitter
-
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -41,21 +43,15 @@ config :ueberauth, Ueberauth,
 
 
 
-config :guardian, Guardian,
-  # optional
-  allowed_algos: ["HS512"],
-  # optional
-  verify_module: Guardian.JWT,
-  issuer: "MyApp",
+config :tilex, Tilex.Auth.Guardian,
+  issuer: "tilex",
   ttl: {30, :days},
   allowed_drift: 2000,
-  # optional
   verify_issuer: true,
   secret_key: %{
     "k" => "_AbBL082GKlPjoY9o-KM78PhyALavJRtZXOW7D-ZyqE",
     "kty" => "oct"
-  },
-  serializer: Tilex.GuardianSerializer
+  }
 
 
 

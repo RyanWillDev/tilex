@@ -10,15 +10,18 @@ defmodule TilexWeb.PostController do
 
   plug(
     Plug.EnsureAuthenticated,
-    [handler: __MODULE__]
+    [error_handler: __MODULE__]
     when action in ~w(new create edit update)a
   )
 
-  def unauthenticated(conn, _) do
+  @behaviour Guardian.Plug.ErrorHandler
+
+  @impl Guardian.Plug.ErrorHandler
+  def auth_error(conn, {_failure_type, _reason}, _opts) do
     conn
     |> put_status(302)
     |> put_flash(:info, "Authentication required")
-    |> redirect(to: "/")
+    |> redirect(to: post_path(conn, :index))
   end
 
   def index(conn, %{"q" => search_query} = params) do
@@ -36,7 +39,7 @@ defmodule TilexWeb.PostController do
   end
 
   def index(conn, %{"format" => format}) when format in ~w(rss atom),
-    do: redirect(conn, to: "/rss")
+    do: redirect(conn, to: feed_path(conn, :index))
 
   def index(conn, params) do
     page = robust_page(params)
@@ -90,7 +93,7 @@ defmodule TilexWeb.PostController do
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(%{likes: likes}))
+    |> send_resp(200, Jason.encode!(%{likes: likes}))
   end
 
   def unlike(conn, %{"slug" => slug}) do
@@ -98,7 +101,7 @@ defmodule TilexWeb.PostController do
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(%{likes: likes}))
+    |> send_resp(200, Jason.encode!(%{likes: likes}))
   end
 
   def create(conn, %{"post" => post_params}) do
@@ -171,7 +174,7 @@ defmodule TilexWeb.PostController do
         |> redirect(to: post_path(conn, :show, post))
 
       {:error, changeset} ->
-        render(conn, "edit.html", post: post, changeset: changeset)
+        render(conn, "edit.html", post: post, changeset: changeset, current_user: current_user)
     end
   end
 
@@ -193,7 +196,8 @@ defmodule TilexWeb.PostController do
       :error ->
         conn
         |> put_status(404)
-        |> render(TilexWeb.ErrorView, "404.html")
+        |> put_view(TilexWeb.ErrorView)
+        |> render("404.html")
         |> halt()
     end
   end

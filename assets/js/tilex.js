@@ -34,5 +34,6 @@ $(function() {
     newChannelNameInput: $('#new-channel-name'),
     newChannelHashTagInput: $('#new-channel-hashtag'),
     channelSelect: $('#post_channel_id')
+    loadingIndicator: document.querySelector('.loading-indicator'),
   }).init();
 });
