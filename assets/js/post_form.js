@@ -17,21 +17,21 @@ import 'codemirror/theme/dracula.css';
 import { uploadImage } from './image_uploader.js';
 
 export default class PostForm {
-  constructor(properties) {
-    this.$postBodyInput = properties.postBodyInput;
-    this.$postBodyPreview = properties.postBodyPreview;
-    this.$wordCountContainer = properties.wordCountContainer;
-    this.$bodyWordLimitContainer = properties.bodyWordLimitContainer;
-    this.bodyWordLimit = properties.bodyWordLimit;
-    this.$titleInput = properties.titleInput;
+  constructor(props) {
+    this.$postBodyInput = props.postBodyInput;
+    this.$postBodyPreview = props.postBodyPreview;
+    this.$wordCountContainer = props.wordCountContainer;
+    this.$bodyWordLimitContainer = props.bodyWordLimitContainer;
+    this.bodyWordLimit = props.bodyWordLimit;
+    this.$titleInput = props.titleInput;
     this.$titleCharacterLimitContainer =
-      properties.titleCharacterLimitContainer;
-    this.$addChannelButton = properties.addChannelButton;
-    this.$newChannelNameInput = properties.newChannelNameInput;
-    this.$newChannelHashtagInput = properties.newChannelHashTagInput;
-    this.$channelSelect = properties.channelSelect;
-    this.titleCharacterLimit = properties.titleCharacterLimit;
-    this.$previewTitleContainer = properties.previewTitleContainer;
+      props.titleCharacterLimitContainer;
+    this.$addChannelButton = props.addChannelButton;
+    this.$newChannelNameInput = props.newChannelNameInput;
+    this.$newChannelHashtagInput = props.newChannelHashTagInput;
+    this.$channelSelect = props.channelSelect;
+    this.titleCharacterLimit = props.titleCharacterLimit;
+    this.$previewTitleContainer = props.previewTitleContainer;
     this.loadingIndicator = props.loadingIndicator;
     this.handlePostBodyPreview = this.handlePostBodyPreview.bind(this);
     this.handleAddChannel = this.handleAddChannel.bind(this);
