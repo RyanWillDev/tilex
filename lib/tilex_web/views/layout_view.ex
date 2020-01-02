@@ -27,7 +27,7 @@ defmodule TilexWeb.LayoutView do
   def page_title(_), do: Application.get_env(:tilex, :organization_name)
 
 
-  def twitter_image_url(%Tilex.Post{} = post) do
+  def twitter_image_url(_) do
     TilexWeb.Endpoint.static_url() <> "/assets/twitter_card_image.png"
   end
 
@@ -60,7 +60,7 @@ defmodule TilexWeb.LayoutView do
   end
 
   def twitter_title(_post) do
-    "Today I Learned: a Hashrocket Project"
+    "Today I Learned"
   end
 
   def twitter_description(%Tilex.Post{} = post) do
