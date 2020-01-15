@@ -15,11 +15,11 @@ import Config
 config :tilex, TilexWeb.Endpoint,
   instrumenters: [Appsignal.Phoenix.Instrumenter],
   http: [port: {:system, "PORT"}, compress: true],
-  url: [host: "til.ryanwilldev.com", port: 80],
+  url: [host: "til.ryanwill.dev", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json",
   secret_key_base: "${SECRET_KEY_BASE}",
   server: true,
-  static_url: [host: "til.ryanwilldev.com", scheme: "https", port: 443]
+  static_url: [host: "til.ryanwill.dev", scheme: "https", port: 443]
 
 # Do not print debug messages in production
 config :logger, level: :info
